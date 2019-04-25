@@ -13,6 +13,7 @@ import com.example.polls.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("/user/hello")
-    @PreAuthorize("hasRole('ADMIN')")
+    @Secured("ROLE_ADMIN")
     public String sayHello() {
        return "hello";
     }
