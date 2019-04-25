@@ -13,16 +13,11 @@ import com.example.polls.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -38,8 +33,7 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/user/me")
-    @PreAuthorize("hasRole('USER')")
-    //@Secured("USER")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
         UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
         return userSummary;
@@ -62,12 +56,13 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt());
+        String userRole = user.getRoles().stream().findFirst().get().getName().name();
+        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), userRole);
 
         return userProfile;
     }
 
-    //TODO
+    //TODO: it isn't possible to change the role of an user
     @GetMapping("/user/makemeadmin")
     public String makeToAdmin(@CurrentUser UserPrincipal currentUser){
         User user = userRepository.findByUsername(currentUser.getUsername())
@@ -92,6 +87,11 @@ public class UserController {
         //return "hello";
     }
 
+    @GetMapping("/user/hello")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String sayHello() {
+       return "hello";
+    }
 
 
 }
