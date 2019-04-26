@@ -13,6 +13,8 @@ import java.util.TimeZone;
 		PollsApplication.class,
 		Jsr310JpaConverters.class
 })
+
+// tutorial from: https://www.callicoder.com/spring-boot-spring-security-jwt-mysql-react-app-part-1/
 public class PollsApplication {
 	@PostConstruct
 	void init() {
